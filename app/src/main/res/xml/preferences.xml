@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:defaultValue="30"
+        android:key="batteryMinLevel"
+        android:title="@string/batteryMinLevel" />
+    <EditTextPreference
+        android:defaultValue="100"
+        android:key="batteryMaxLevel"
+        android:title="@string/batteryMaxLevel" />
+
+    <RingtonePreference
+        android:key="LowLevelSound"
+        android:ringtoneType="all"
+        android:title="@string/LowLevelSound" />
+    <RingtonePreference
+        android:key="FullLevelSound"
+        android:ringtoneType="all"
+        android:title="@string/FullLevelSound" />
+
+    <com.simon.preferences.TimePreference
+        android:dialogMessage="Silent Time Start"
+        android:key="startTime"
+        android:summary="Silent Time"
+        android:title="Silent Time" />
+
+</PreferenceScreen>

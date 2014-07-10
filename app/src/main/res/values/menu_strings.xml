@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="batteryMinLevel">Battery minimum level</string>
+    <string name="batteryMaxLevel">Battery maximum level</string>
+    <string name="LowLevelSound">Low Level Sound</string>
+    <string name="FullLevelSound">Full Level Sound</string>
+
+</resources>
