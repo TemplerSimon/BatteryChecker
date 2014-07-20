@@ -1,6 +1,7 @@
 package com.simon.batterychecker;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -16,11 +17,13 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.simon.battery.dao.BatteryRepository;
 import com.simon.battery.model.BatteryModel;
 import com.simon.battery.model.DisChargingModel;
+import com.simon.battery.model.InternalConfiguration;
 
 import java.util.Calendar;
 import java.util.List;
@@ -30,6 +33,8 @@ import java.util.List;
  */
 public class BatteryCheckerService extends Service {
 
+
+    private static final String ALARM_COUNT = "countLowLevel";
 
     private NotificationManager mNM;
     private static final String SPLIT = ";";
@@ -41,6 +46,8 @@ public class BatteryCheckerService extends Service {
     private Uri fullLevelSound;
     private Uri noneSound;
 
+    private Button startButton;
+
     private Calendar cal;
 
     private static final String LABEL = "BatteryCheckerService";
@@ -49,6 +56,7 @@ public class BatteryCheckerService extends Service {
     private int maxLevel;
     private int status;
     private int lastLevel;
+    private int lowLevelAlarmCount;
 
     private Integer startHour;
     private Integer startMinut;
@@ -59,9 +67,6 @@ public class BatteryCheckerService extends Service {
 
     // Database
     private BatteryRepository repos;
-
-    // private final Logger log = LoggerFactory
-    // .getLogger(BatteryCheckerService.class);
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -97,7 +102,7 @@ public class BatteryCheckerService extends Service {
 
         lastLevel = 0;
 
-        Toast.makeText(this, R.string.service_start, Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -128,10 +133,15 @@ public class BatteryCheckerService extends Service {
         } catch (IllegalStateException ise) {
             Log.e(LABEL, ise.getMessage());
         }
+
+
+        if (repos.getLastInternalConfValue(ALARM_COUNT) == null)
+            repos.setInternalConfValue(ALARM_COUNT, 0);
+
         // LogToFile.configure();
 
         // log.info("Urchomienie uslugi");
-
+        Toast.makeText(this, R.string.service_start, Toast.LENGTH_SHORT).show();
         return START_STICKY;
     }
 
@@ -181,13 +191,13 @@ public class BatteryCheckerService extends Service {
         String levelMin;
         String levelMax;
         String silentTime;
-
+        String lowLAC;
         String[] intervel;
 
         levelMin = sharedPrefs.getString("batteryMinLevel", "30");
         levelMax = sharedPrefs.getString("batteryMaxLevel", "100");
         silentTime = sharedPrefs.getString("startTime", "22:00;06:00");
-
+        lowLAC = sharedPrefs.getString(ALARM_COUNT, "5");
         intervel = silentTime.split(SPLIT);
 
         try {
@@ -200,6 +210,8 @@ public class BatteryCheckerService extends Service {
             stopHour = Integer.parseInt(intervel[1].split(":")[0]);
             stopMinut = Integer.parseInt(intervel[1].split(":")[1]);
 
+            lowLevelAlarmCount = Integer.parseInt(lowLAC);
+
         } catch (NumberFormatException nfe) {
             minLevel = 30;
             maxLevel = 100;
@@ -210,15 +222,23 @@ public class BatteryCheckerService extends Service {
             stopHour = 06;
             stopMinut = 00;
 
+            lowLevelAlarmCount = 5;
+
             Log.e(LABEL, nfe.getMessage());
         }
     }
 
+    /**
+     * Recevier listen to event when power source is plugged.
+     */
     private BroadcastReceiver chargingInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // log.info("Czyszczenie bazy danych.");
+            //"Clean datebase from old values."
             new CleanDB().start();
+            //Set ALARM_COUNT parameter to zero
+            repos.setInternalConfValue(ALARM_COUNT, 0);
+            mNM.cancel(STATE_NOTIFICATION);
             int charging = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
         }
     };
@@ -266,26 +286,42 @@ public class BatteryCheckerService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             BatteryModel model = new BatteryModel();
+            InternalConfiguration alarmCountPref = new InternalConfiguration();
 
             status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, 0);
             int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            alarmCountPref = repos.getLastInternalConfValue(ALARM_COUNT);
 
             if (lastLevel != level || lastLevel == 0) {
                 if (level <= minLevel
                         && (status == BatteryManager.BATTERY_STATUS_DISCHARGING
                         || status == BatteryManager.BATTERY_STATUS_UNKNOWN || status == BatteryManager.BATTERY_STATUS_NOT_CHARGING)) {
-                    showBatteryState(makeSoundChecker());
+
+                    if (alarmCountPref != null && alarmCountPref.getCurrentvalue() <= lowLevelAlarmCount) {
+                        showBatteryState(makeSoundChecker());
+                        repos.setInternalConfValue(ALARM_COUNT, alarmCountPref.getCurrentvalue() + 1);
+                    }
+                    if (alarmCountPref != null && alarmCountPref.getCurrentvalue() > lowLevelAlarmCount) {
+                        showBatteryState(false);
+                        repos.setInternalConfValue(ALARM_COUNT, alarmCountPref.getCurrentvalue() + 1);
+                    } else if (alarmCountPref == null) {
+                        showBatteryState(makeSoundChecker());
+                        repos.setInternalConfValue(ALARM_COUNT, 1);
+                    }
+
                 } else if (level == maxLevel
                         && maxLevel != intent.getIntExtra(
                         BatteryManager.EXTRA_SCALE, 0)
                         && status == BatteryManager.BATTERY_STATUS_CHARGING) {
                     fullBatteryState(makeSoundChecker());
+
                 } else if (maxLevel == intent.getIntExtra(
                         BatteryManager.EXTRA_SCALE, 0)
                         && level == maxLevel
                         && status == BatteryManager.BATTERY_STATUS_FULL) {
                     fullBatteryState(makeSoundChecker());
                 }
+
                 lastLevel = level;
                 model.setDate(System.currentTimeMillis() + "");
                 model.setLevel(level);

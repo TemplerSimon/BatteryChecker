@@ -12,6 +12,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.simon.battery.model.BatteryModel;
 import com.simon.battery.model.DisChargingModel;
+import com.simon.battery.model.InternalConfiguration;
 
 import java.sql.SQLException;
 
@@ -21,11 +22,13 @@ import java.sql.SQLException;
 public class BatteryCheckerDaoHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "batterychecker.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 7;
     private Dao<BatteryModel, Integer> batteryModelDao = null;
     private Dao<DisChargingModel, Integer> batteryDisChargingDao = null;
+    private Dao<InternalConfiguration, Integer> internalConfDao = null;
     private RuntimeExceptionDao<BatteryModel, Integer> batteryModelRuntimeDao = null;
     private RuntimeExceptionDao<DisChargingModel, Integer> batteryDisChargingRuntimeDao = null;
+    private RuntimeExceptionDao<InternalConfiguration, Integer> internalConfRuntimeDao = null;
 
     public BatteryCheckerDaoHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,6 +45,7 @@ public class BatteryCheckerDaoHelper extends OrmLiteSqliteOpenHelper {
             Log.i(BatteryCheckerDaoHelper.class.getName(), "onCreate");
             TableUtils.createTable(connectionSource, BatteryModel.class);
             TableUtils.createTable(connectionSource, DisChargingModel.class);
+            TableUtils.createTable(connectionSource, InternalConfiguration.class);
         } catch (SQLException e) {
             Log.e(BatteryCheckerDaoHelper.class.getName(),
                     "Can't create database", e);
@@ -62,6 +66,8 @@ public class BatteryCheckerDaoHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.dropTable(connectionSource, BatteryModel.class, true);
             TableUtils
                     .dropTable(connectionSource, DisChargingModel.class, true);
+            TableUtils
+                    .dropTable(connectionSource, InternalConfiguration.class, true);
             // after we drop the old databases, we create the new ones
             onCreate(db, connectionSource);
         } catch (SQLException e) {
@@ -91,6 +97,14 @@ public class BatteryCheckerDaoHelper extends OrmLiteSqliteOpenHelper {
         return batteryDisChargingDao;
     }
 
+    public Dao<InternalConfiguration, Integer> getInternalConfDao()
+            throws SQLException {
+        if (internalConfDao == null) {
+            internalConfDao = getDao(InternalConfiguration.class);
+        }
+        return internalConfDao;
+    }
+
     /**
      * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao
      * for our SimpleData class. It will create it or just give the cached
@@ -110,6 +124,13 @@ public class BatteryCheckerDaoHelper extends OrmLiteSqliteOpenHelper {
         return batteryDisChargingRuntimeDao;
     }
 
+    public RuntimeExceptionDao<InternalConfiguration, Integer> getIntenralConfRuntimeDao() {
+        if (internalConfRuntimeDao == null) {
+            internalConfRuntimeDao = getRuntimeExceptionDao(InternalConfiguration.class);
+        }
+        return internalConfRuntimeDao;
+    }
+
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -118,6 +139,7 @@ public class BatteryCheckerDaoHelper extends OrmLiteSqliteOpenHelper {
         super.close();
         batteryModelDao = null;
         batteryDisChargingDao = null;
+        internalConfDao = null;
     }
 
 }

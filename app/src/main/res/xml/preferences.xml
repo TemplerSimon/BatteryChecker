@@ -25,4 +25,9 @@
         android:summary="Silent Time"
         android:title="Silent Time" />
 
+    <EditTextPreference
+        android:defaultValue="5"
+        android:key="countLowLevel"
+        android:title="@string/lowlevelalarmcount"/>
+
 </PreferenceScreen>

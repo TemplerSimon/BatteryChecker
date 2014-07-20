@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.simon.batterychecker"
-        minSdkVersion 19
+        minSdkVersion 15
         targetSdkVersion 20
         versionCode 1
         versionName "1.0"
@@ -16,6 +16,22 @@ android {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    packagingOptions{
+        exclude 'com/j256/ormlite/core/LICENSE.txt'
+        exclude 'com/j256/ormlite/core/README.txt'
+        exclude 'allclasses-frame.html'
+        exclude 'allclasses-noframe.html'
+        exclude 'com/j256/ormlite/db/package-frame.html'
+        exclude 'com/j256/ormlite/db/package-summary.html'
+        exclude 'com/j256/ormlite/db/package-tree.html'
+        exclude 'com/j256/ormlite/db/package-use.html'
+        exclude 'com/j256/ormlite/logger/package-frame.html'
+        exclude 'com/j256/ormlite/db/package-summary.html'
+        exclude 'com/j256/ormlite/db/package-tree.html'
+        exclude 'com/j256/ormlite/db/package-use.html'
+        exclude 'com/j256/ormlite/android/LICENSE.txt'
+        exclude 'com/j256/ormlite/android/README.txt'
     }
 }
 

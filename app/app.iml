@@ -65,9 +65,7 @@
     <orderEntry type="library" exported="" name="android-support-v4" level="project" />
     <orderEntry type="library" exported="" name="ormlite-core-4.48" level="project" />
     <orderEntry type="library" exported="" name="ormlite-core-4.48-sources" level="project" />
-    <orderEntry type="library" exported="" name="ormlite-jdbc-4.48-javadoc" level="project" />
     <orderEntry type="library" exported="" name="ormlite-android-4.48-sources" level="project" />
-    <orderEntry type="library" exported="" name="ormlite-core-4.48-javadoc" level="project" />
     <orderEntry type="library" exported="" name="ormlite-jdbc-4.48-sources" level="project" />
   </component>
 </module>

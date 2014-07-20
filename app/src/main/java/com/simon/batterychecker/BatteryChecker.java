@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.simon.discharging.DisChargingActivity;
 import com.simon.preferences.BatteryCheckerPreferences;
@@ -15,6 +16,9 @@ public class BatteryChecker extends Activity {
 
     private static final String LABEL = "BatteryChecker";
     private Intent i;
+
+
+    Button startButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +30,9 @@ public class BatteryChecker extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.battery_checker, menu);
+
+        startButton = (Button) findViewById(R.id.button1);
+
         return true;
     }
 

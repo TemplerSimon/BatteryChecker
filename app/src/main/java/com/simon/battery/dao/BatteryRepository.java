@@ -5,9 +5,14 @@ import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.query.In;
 import com.simon.battery.model.BatteryModel;
 import com.simon.battery.model.DisChargingModel;
+import com.simon.battery.model.InternalConfiguration;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +25,7 @@ public class BatteryRepository {
     private BatteryCheckerDaoHelper db;
     Dao<BatteryModel, Integer> batteryModelDao;
     Dao<DisChargingModel, Integer> disChargingModelDao;
+    Dao<InternalConfiguration, Integer> internalConfDao;
 
     public BatteryRepository(Context ctx) {
         try {
@@ -27,6 +33,7 @@ public class BatteryRepository {
             db = dbManager.getHelper(ctx);
             batteryModelDao = db.getBatteryCheckerDao();
             disChargingModelDao = db.getDisChargingBatteryDao();
+            internalConfDao = db.getInternalConfDao();
         } catch (java.sql.SQLException e) {
             Log.e(BatteryRepository.class.getName(), e.getMessage());
             e.printStackTrace();
@@ -146,8 +153,8 @@ public class BatteryRepository {
         }
         return 0;
     }
+
     /**
-     *
      * @return last model object from DisCharging table or null if SqlExeption or no object in DB
      */
     public DisChargingModel getLastObject() {
@@ -160,5 +167,64 @@ public class BatteryRepository {
         return null;
     }
 
+
+    /**
+     * @param currentValue - maxValue of the conf property
+     * @param name         - name of the property
+     * @author simon
+     */
+    public void setInternalConfValue(String name, int currentValue) {
+        InternalConfiguration intConf = new InternalConfiguration();
+
+        try {
+            intConf = getFirstInternalConfiguration(name);
+
+            if (intConf == null) {
+                InternalConfiguration intConfNew = new InternalConfiguration();
+                intConfNew.setName(name);
+                intConfNew.setCurrentvalue(0);
+                internalConfDao.create(intConfNew);
+            } else if (intConf != null) {
+                intConf.setName(name);
+                intConf.setCurrentvalue(currentValue);
+                internalConfDao.update(intConf);
+            }
+        } catch (SQLException e) {
+            Log.e(BatteryRepository.class.getName(), e.getMessage());
+        }
+    }
+
+    /**
+     * @param name
+     * @return Internal configuration parameter obtained by name.
+     * @author simon
+     */
+    public InternalConfiguration getLastInternalConfValue(String name) {
+        InternalConfiguration intConf = new InternalConfiguration();
+
+        intConf = getFirstInternalConfiguration(name);
+
+        if (intConf == null) {
+            return null;
+        } else {
+            return intConf;
+        }
+    }
+
+    private InternalConfiguration getFirstInternalConfiguration(String name) {
+        try {
+            QueryBuilder<InternalConfiguration, Integer> queryBuilder = internalConfDao.queryBuilder();
+
+            queryBuilder.where().eq(InternalConfiguration.NAME, name);
+
+            PreparedQuery<InternalConfiguration> preparedQuery = queryBuilder.prepare();
+
+            return internalConfDao.queryForFirst(preparedQuery);
+
+        } catch (SQLException e) {
+            Log.e(BatteryRepository.class.getName(), e.getMessage());
+        }
+        return null;
+    }
 
 }
