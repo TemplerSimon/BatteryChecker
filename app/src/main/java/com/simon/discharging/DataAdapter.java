@@ -53,7 +53,7 @@ public class DataAdapter extends BaseAdapter {
 
         Long startString;
         Long stopString;
-        String disChargePercent = new String();
+        String disChargePercent = "";
 
         View gridView;
         if (convertView == null) {

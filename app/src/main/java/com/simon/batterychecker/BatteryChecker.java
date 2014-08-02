@@ -1,7 +1,10 @@
 package com.simon.batterychecker;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +22,7 @@ public class BatteryChecker extends Activity {
 
 
     Button startButton;
+    Button stopButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,13 @@ public class BatteryChecker extends Activity {
         getMenuInflater().inflate(R.menu.battery_checker, menu);
 
         startButton = (Button) findViewById(R.id.button1);
+        stopButton = (Button) findViewById(R.id.button2);
+
+        if (isMyServiceRunning(BatteryCheckerService.class)) {
+            startButton.setBackgroundColor(Color.GREEN);
+        } else {
+            startButton.setBackgroundColor(Color.RED);
+        }
 
         return true;
     }
@@ -51,11 +62,13 @@ public class BatteryChecker extends Activity {
     public void startService(View v) {
         i = new Intent(this, BatteryCheckerService.class);
         this.startService(i);
+        startButton.setBackgroundColor(Color.GREEN);
     }
 
     public void stopService(View v) {
         i = new Intent(this, BatteryCheckerService.class);
         this.stopService(i);
+        startButton.setBackgroundColor(Color.RED);
     }
 
     public void restartService(View v) {
@@ -74,4 +87,15 @@ public class BatteryChecker extends Activity {
         startActivity(i);
     }
 
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
+

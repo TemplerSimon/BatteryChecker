@@ -34,6 +34,9 @@ import java.util.List;
 public class BatteryCheckerService extends Service {
 
 
+    Button startButton;
+    Button stopButton;
+
     private static final String ALARM_COUNT = "countLowLevel";
 
     private NotificationManager mNM;
@@ -45,8 +48,6 @@ public class BatteryCheckerService extends Service {
     private Uri lowLevelSound;
     private Uri fullLevelSound;
     private Uri noneSound;
-
-    private Button startButton;
 
     private Calendar cal;
 
@@ -101,8 +102,6 @@ public class BatteryCheckerService extends Service {
         repos = new BatteryRepository(this);
 
         lastLevel = 0;
-
-
     }
 
     @Override
@@ -142,6 +141,7 @@ public class BatteryCheckerService extends Service {
 
         // log.info("Urchomienie uslugi");
         Toast.makeText(this, R.string.service_start, Toast.LENGTH_SHORT).show();
+
         return START_STICKY;
     }
 
@@ -356,20 +356,5 @@ public class BatteryCheckerService extends Service {
         } else
             return startHourMinut >= stopHourMinut || !(currentHourMinut >= startHourMinut && currentHourMinut <= stopHourMinut);
     }
-
-//	private void actualLevel(int level) {
-//		DisChargingModel modelLast = new DisChargingModel();
-//
-//		modelLast = repos.getLastObject();
-//
-//		if (modelLast != null  && modelLast.getId() > 0){
-//			if (modelLast.getStartdate() != null && !modelLast.getStartdate().equals("")){
-//				if (modelLast.getStartlevel() > 0){
-//
-//				}
-//			}
-//		}
-//
-//	}
 
 }
