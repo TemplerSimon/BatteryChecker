@@ -6,7 +6,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".BatteryChecker" >
+    tools:context=".BatteryChecker"
+    android:background="@android:color/holo_blue_light">
 
     <Button
         android:id="@+id/button2"
@@ -15,7 +16,8 @@
         android:layout_alignLeft="@+id/button1"
         android:layout_below="@+id/button1"
         android:onClick="stopService"
-        android:text="@string/stop_button" />
+        android:text="@string/stop_button"
+        android:background="@drawable/round_corner"/>
 
     <Button
         android:id="@+id/button1"
@@ -24,7 +26,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:onClick="startService"
-        android:text="@string/start_button" />
+        android:text="@string/start_button"
+        android:background="@drawable/round_corner"/>
 
     <Button
         android:id="@+id/button3"
@@ -33,7 +36,8 @@
         android:layout_alignLeft="@+id/button2"
         android:layout_below="@+id/button2"
         android:onClick="restartService"
-        android:text="@string/restart_button" />
+        android:text="@string/restart_button"
+        android:background="@drawable/round_corner"/>
 
     <Button
         android:id="@+id/disChargingButton"
@@ -42,6 +46,7 @@
         android:onClick="showDischarging"
         android:text="Data"
         android:layout_alignLeft="@+id/button3"
-        android:layout_below="@+id/button3" />
+        android:layout_below="@+id/button3"
+        android:background="@drawable/round_corner"/>
 
 </RelativeLayout>

@@ -229,7 +229,7 @@ public class BatteryCheckerService extends Service {
     }
 
     /**
-     * Recevier listen to event when power source is plugged.
+     * Receiver listen to event when power source is plugged.
      */
     private BroadcastReceiver chargingInfoReceiver = new BroadcastReceiver() {
         @Override
@@ -244,7 +244,7 @@ public class BatteryCheckerService extends Service {
     };
 
     /**
-     * Revievier for connecting and disconnecting power source
+     * Receiver for connecting and disconnecting power source
      */
     private BroadcastReceiver disChargingReceiver = new BroadcastReceiver() {
 
@@ -281,6 +281,9 @@ public class BatteryCheckerService extends Service {
         }
     };
 
+    /**
+     * Battery info receiver.
+     */
     private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
 
         @Override
@@ -331,6 +334,9 @@ public class BatteryCheckerService extends Service {
 
     };
 
+    /**
+     * Clean database from old data
+     */
     private class CleanDB extends Thread {
         @Override
         public void run() {
@@ -338,12 +344,18 @@ public class BatteryCheckerService extends Service {
         }
     }
 
+
     private void cleanDB() {
         int count;
         count = repos.deleteByDate(System.currentTimeMillis());
         // log.info("Usunieto " + count + " rekordow");
     }
 
+    /**
+     * Check that sound should by played.
+     *
+     * @return - true if sound should by played or false if sound shouldn't be played.
+     */
     private boolean makeSoundChecker() {
         int currentHourMinut = cal.get(Calendar.HOUR_OF_DAY) * HOUR
                 + cal.get(Calendar.MINUTE);

@@ -24,26 +24,28 @@ public class BatteryChecker extends Activity {
     Button startButton;
     Button stopButton;
 
+    /*
+    Create the view
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battery_checker);
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.battery_checker, menu);
 
         startButton = (Button) findViewById(R.id.button1);
         stopButton = (Button) findViewById(R.id.button2);
 
-        if (isMyServiceRunning(BatteryCheckerService.class)) {
-            startButton.setBackgroundColor(Color.GREEN);
-        } else {
-            startButton.setBackgroundColor(Color.RED);
-        }
+        isMyServiceRunning(BatteryCheckerService.class);
+    }
 
+    /*
+
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.battery_checker, menu);
         return true;
     }
 
@@ -59,22 +61,33 @@ public class BatteryChecker extends Activity {
         return true;
     }
 
+    /*
+    Start service
+     */
     public void startService(View v) {
         i = new Intent(this, BatteryCheckerService.class);
         this.startService(i);
         startButton.setBackgroundColor(Color.GREEN);
     }
 
+    /*
+    Stop service
+     */
     public void stopService(View v) {
         i = new Intent(this, BatteryCheckerService.class);
         this.stopService(i);
         startButton.setBackgroundColor(Color.RED);
     }
 
+    /*
+    Restart service
+     */
     public void restartService(View v) {
         Intent i = new Intent(this, BatteryCheckerService.class);
         this.stopService(i);
         this.startService(i);
+
+
     }
 
 /*    public void makeChart(View v) {
@@ -82,20 +95,26 @@ public class BatteryChecker extends Activity {
         startActivity(i);
     }*/
 
+
+    /*
+    Show statistics about battery discharging.
+     */
     public void showDischarging(View v) {
         Intent i = new Intent(this, DisChargingActivity.class);
         startActivity(i);
     }
 
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
+    /*
+    Check that service is running and change color of start or stop button.
+     */
+    private void isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
+                startButton.setBackgroundColor(Color.GREEN);
             }
         }
-        return false;
+        startButton.setBackgroundColor(Color.RED);
     }
 }
 
